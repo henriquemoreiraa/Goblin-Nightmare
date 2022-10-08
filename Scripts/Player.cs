@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
 
     private Animator anim;
     private string WALK_ANIMATION = "Walk";
+    private string JUMP_ANIMATION = "Jump";
     private string GROUND_TAG = "Ground";
     private string ENEMY_TAG = "Enemy";
 
@@ -65,16 +66,40 @@ public class Player : MonoBehaviour
     }   
 
     void PlayerJump() {
-        if (Input.GetButtonDown("Jump") && isGrounded) {
+        if (Input.GetButtonDown("Jump") && isGrounded && movementX > 0) {
             isGrounded = false;
+
+            myBody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+            sr.flipX = false;  
+
+            anim.SetBool(JUMP_ANIMATION, true);
+            anim.SetBool(WALK_ANIMATION, false);         
+
+        } else if (Input.GetButtonDown("Jump") && isGrounded && movementX < 0) {
+            isGrounded = false;
+
+            myBody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+            sr.flipX = true;
+
+            anim.SetBool(JUMP_ANIMATION, true);
+            anim.SetBool(WALK_ANIMATION, false);
+
+        } else if (Input.GetButtonDown("Jump") && isGrounded && movementX == 0) {
+            isGrounded = false;
+
             myBody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             
-        }      
+            anim.SetBool(JUMP_ANIMATION, true);
+            anim.SetBool(WALK_ANIMATION, false);
+
+        }
+
     } 
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag(GROUND_TAG)) {
             isGrounded = true;
+            anim.SetBool(JUMP_ANIMATION, false);
         }
         if (collision.gameObject.CompareTag(ENEMY_TAG)) {
             Destroy(gameObject);
